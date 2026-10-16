@@ -45,6 +45,11 @@ Items marked (H) are hypotheses. Nothing here promises forecast accuracy.
 4. **Question.** Are transfers to the central warehouse in the assembly plan, or are they separate?
 5. **Request.** Daily occupancy per class since the August change. It is five numbers a day. Without it, no backtest is possible.
 6. **Request.** The plan exports every day from now on. We store each version, so by December we have plan history for an honest backtest.
+7. **Question.** How should the tool fit into Coster's systems? The briefs say it should fit the existing systems and later read from the SQL Server staging database. The form is open:
+   - Do you work with a microservice architecture? If so, in which language and on which platform?
+   - Should we build our forecast as such a service in your language? Or can it stay a Python service that your systems call through an API, for example in a Docker container? Or is it a fully separate application with its own dashboard?
+   - Should the dashboard be a separate web page, or part of a screen you already use?
+   - For the prototype, are Excel exports fine, or should we read from the staging database from the start?
 
 Why 110 wide cells stayed free on 20 May will show in the master data, in the list of classes each load-unit type may use. That is a data check, not a question.
 
@@ -170,8 +175,7 @@ def daily_flows(prev: pd.DataFrame, curr: pd.DataFrame) -> pd.DataFrame:
     moved = pd.DataFrame({"src": p[both], "dst": c[both]})
     moved = moved[moved["src"] != moved["dst"]]
     net = moved["dst"].value_counts().sub(moved["src"].value_counts(), fill_value=0)
-    out = pd.DataFrame({"inbound_actual": new, "outbound_actual": gone,
-                        "internal_transfer": net})
+    out = pd.DataFrame({"inbound_actual": new, "outbound_actual": gone, "internal_transfer": net})
     return out.reindex(CELL_CLASSES).fillna(0).astype(int)
 ```
 
