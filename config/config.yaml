@@ -1,0 +1,51 @@
+# All numbers and rules live here. Nothing is hard-coded in the package.
+# (H) = hypothesis to confirm with Coster.
+
+paths:
+  raw: data/raw              # Coster exports, untouched, git-ignored
+  interim: data/interim      # validated parquet, one per source file
+  processed: data/processed  # daily_dataset.parquet, forecast.parquet
+
+snapshot_hour: 6             # the WMS saves the AW occupancy every day at 06:00
+
+cell_classes:                # height x width in mm, from the challenge briefs
+  Low:          {height: 650,  width: 800}
+  Medium:       {height: 1200, width: 800}
+  High:         {height: 2200, width: 800}
+  Medium W1000: {height: 1200, width: 1000}
+  High W1000:   {height: 2200, width: 1000}
+
+# Cells in use per class (briefs). The real values come from the cell master.
+# The layout changed in August (H: check against the master data).
+capacity_default:
+  Low: 1049
+  Medium: 248
+  High: 186
+  Medium W1000: 144
+  High W1000: 192
+
+# Allocation cascade per pallet size group. The first class is the group's own class.
+# Default until Coster's allowed-class list arrives (H).
+cascade:
+  650x800:   [Low, Medium, High, Medium W1000, High W1000]
+  650x1000:  [Medium W1000, High W1000]
+  1200x800:  [Medium, High, Medium W1000, High W1000]
+  2200x800:  [High, High W1000]
+  1200x1000: [Medium W1000, High W1000]
+  2200x1000: [High W1000]
+
+# Cells a class keeps free for its own pallets. 20 May 2026 values, re-estimate (H).
+held_back:
+  Medium W1000: 45
+  High W1000: 65
+
+forecast:
+  horizon_days: 14
+  method: persistence        # switch to flow_balance once plans are loaded
+  p_realised: 0.9            # share of planned pallets that happen on their day (H)
+  n_runs: 500
+  seed: 42
+
+thresholds:                  # WMS colours as remembered at the kick-off (H)
+  warning: 0.80
+  critical: 0.90

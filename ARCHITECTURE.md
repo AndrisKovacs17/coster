@@ -28,10 +28,39 @@ ingest  ->  dataset  ->  forecast  ->  alerts
 | `dashboard` | Streamlit app: fill ratio per cell class, 14-day forecast, alert levels |
 | `common` | Schemas, config loading, I/O helpers |
 
-(Adapt folder names to what is already in the repo.)
+All modules live in one package, `src/coster/`.
+
+## Repository layout
+
+```
+coster/
+├── ARCHITECTURE.md         # this file
+├── README.md               # quickstart
+├── pyproject.toml          # dependencies (uv), ruff and pytest settings
+├── uv.lock                 # pinned versions
+├── config/config.yaml      # every number and rule: capacities, cascade, thresholds, paths
+├── src/coster/
+│   ├── common/             # schemas.py (the two contracts), config.py, io.py
+│   ├── ingest/             # loaders for Coster's Excel exports
+│   ├── dataset/            # daily_dataset: snapshots -> flows per class, mock data
+│   ├── forecast/           # persistence, allocation cascade, flow balance, Monte Carlo, backtest
+│   ├── alerts/             # Group 2
+│   ├── dashboard/          # Group 2, Streamlit
+│   └── pipeline/run.py     # the daily run
+├── tests/                  # one test per function, tiny hand-made tables, never Coster data
+├── data/                   # git-ignored: raw/ (Coster files), interim/, processed/
+├── notebooks/              # exploration only, outputs stripped on commit
+├── docs/
+│   ├── group1-data-forecasting/   # Group 1 plan
+│   └── group2-ui-alerts/          # Group 2 plan
+└── research/               # papers, library checks, experiments, one folder per topic
+```
+
+`research/` holds everything we read or test that informs a decision. Each topic folder has an
+index of its sources. Shared BibTeX is in `research/references.bib`. See `research/README.md`.
 
 ## Contracts between modules
-Two tables are the interfaces. Schemas live in `common/schemas.py` (pandera) and are changed only via PR reviewed by both groups.
+Two tables are the interfaces. Schemas live in `src/coster/common/schemas.py` (pandera) and are changed only via PR reviewed by both groups.
 
 **daily_dataset** (one row per date and cell class):
 `date, cell_class, capacity, occupied, free, fill_ratio, inbound_planned, inbound_actual, outbound_planned, outbound_actual, qc_hold, internal_transfer`
@@ -43,13 +72,13 @@ Storage: parquet files in `data/processed/` (can move to DuckDB/SQLite later wit
 Thresholds and paths live in `config/config.yaml`.
 
 ## Runtime
-- `python -m pipeline.run` runs ingest -> dataset -> forecast -> alerts once.
+- `uv run python -m coster.pipeline.run` runs ingest -> dataset -> forecast -> alerts once.
 - Scheduled daily (cron or GitHub Actions).
 - Dashboard reads the latest outputs.
-- Until real data arrives, a mock data generator produces `daily_dataset` in the agreed schema.
+- Until real data arrives, `--mock` builds a mock `daily_dataset` in the agreed schema.
 
 ## Tech stack
-Python 3.11+, pandas, pandera, scikit-learn / LightGBM, Streamlit, pytest, ruff, pre-commit.
+Python 3.11+, uv, pandas, pandera, pyarrow, openpyxl, scikit-learn / LightGBM, Streamlit, pytest, ruff, pre-commit.
 
 ## When to split into services
 Only if there is a concrete need, for example the dashboard must request forecasts on demand or another system must integrate with ours. Then wrap `forecast` in a FastAPI endpoint. Because modules already communicate through fixed contracts, that split stays cheap.
@@ -58,3 +87,5 @@ Only if there is a concrete need, for example the dashboard must request forecas
 - One branch per feature, PR with at least one review.
 - Schema changes need a PR that both groups approve.
 - Tests for loaders and for the flow-balance logic; CI runs tests and linting.
+- Coster's data never goes into git. `data/` and Excel files are git-ignored.
+- Sources and experiments behind a decision go in `research/`.
