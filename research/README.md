@@ -17,6 +17,9 @@ a method, and what we already ruled out.
 
 Each topic folder has a `README.md` with an index table of its sources.
 
+The October research sprint, which compares the options raised at the 16 October meeting, is
+summarised in [2026-10-research-sprint.md](2026-10-research-sprint.md).
+
 ## How to add a source
 
 1. Copy `_TEMPLATE.md` into the topic folder. Name it `<year>-<first-author>-<short-title>.md`, for example `2020-silva-pwfts.md`.
