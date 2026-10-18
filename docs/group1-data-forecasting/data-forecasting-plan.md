@@ -1,15 +1,19 @@
 # Data and forecasting plan (Group 1)
 
-Draft v0.4, 15 October 2026. For the Group 1 folder in the repo.
+Draft v0.5, 18 October 2026. For the Group 1 folder in the repo.
+
+What changed from v0.4 (review feedback on the deck, 16 October):
+
+- Section 3 states what the time series is and gives a CLI-style input and output example.
+- Section 8 adds the history and plan horizon each rung needs, where the uncertainty comes from (epistemic or aleatoric), and a fallback for short plans.
+- Section 9 lists more hindsight traps.
+- Section 2 adds two requests: machine-stop logs and timestamped entry and exit records.
 
 What changed from v0.3:
 
 - Most questions for Coster are already answered in our material. Section 1 lists the answers. Section 2 keeps only what is still open.
 - The plan is now a concrete coding plan in Python. It covers setup, repo layout, how the warehouse looks in code, each module, tests, and who builds what by when.
 - The code sketches below were run and tested with pandas 3.0, numpy 2.5 and pandera 0.34. They are starting points, not finished code.
-
-Input, output, data needs, uncertainty sources and the MVP order are defined in
-[problem-definition.md](problem-definition.md) (review feedback, 18 October).
 
 Items marked (H) are hypotheses. Nothing here promises forecast accuracy.
 
@@ -53,6 +57,8 @@ Items marked (H) are hypotheses. Nothing here promises forecast accuracy.
    - Should we build our forecast as such a service in your language? Or can it stay a Python service that your systems call through an API, for example in a Docker container? Or is it a fully separate application with its own dashboard?
    - Should the dashboard be a separate web page, or part of a screen you already use?
    - For the prototype, are Excel exports fine, or should we read from the staging database from the start?
+8. **Request.** Machine-stop logs (offered by Riccardo on 16 October). In what format? Is a stop's end time known while the stop is still running?
+9. **Question.** Can Coster export the timestamped entry and exit records per cell that Zishan asked for on 16 October? With them, actual flows become hourly (section 3).
 
 Why 110 wide cells stayed free on 20 May will show in the master data, in the list of classes each load-unit type may use. That is a data check, not a question.
 
@@ -64,6 +70,40 @@ Coster Excel exports ──> ingest ──> dataset ──> forecast ──> (al
 ```
 
 The idea in one paragraph. The warehouse state is a small table: how many pallets of each size group sit in each cell class. Each forecast day adds the planned inflow through the allocation cascade and removes the planned outflow. Pallets that find no allowed free cell are counted as "no cell". That is the saturation event. Repeating this a few hundred times with random plan slips gives a range and the chance of crossing a threshold.
+
+### What the time series is
+
+- **The target is the daily fill ratio per cell class** at the 06:00 snapshot. That is five series with one value per day, and it is what the alert is about.
+- **The drivers are the planned flows** per cell class. The plans are known to the hour, and we sum them into the 06:00-to-06:00 window.
+- **Actual flows are known per day only.** They come from comparing two snapshots (section 7). At the 16 October meeting we answered "hourly inflow and outflow per cell class". That holds for the plans, not for the actuals. Hourly actuals need the entry and exit records (open point 9).
+
+### Input and output of one run
+
+One run per day, after the 06:00 snapshot. It sees only what exists at 06:00 on the run date. The inputs are the snapshot, the cell and load-unit masters valid on that date, and the plan versions known at 06:00 (appendix). The output per class and day +1 to +14 is the median fill ratio, the 10–90% range, the chance of reaching 90% by that day, and pallets with no cell (section 12, C1, C2 and C5).
+
+Target behaviour, with made-up numbers:
+
+```text
+$ uv run python -m coster.pipeline.run --run-date 2026-11-02
+
+inputs as of 2026-11-02 06:00
+  snapshot     snapshot_0600_20261102.xlsx    1,512 load units, 0 rejected rows
+  cell master  valid from 2026-08-18          1,819 cells in service
+  assembly     version 2026-11-01 17:40       412 work orders, horizon to 2026-11-23
+  moulding     version 2026-11-01 16:05       236 orders, horizon to 2026-11-30
+  purchases    version 2026-10-31 09:12       58 arrivals in the next 14 days
+
+forecast  run 2026-11-02, method flow_balance, 500 runs
+  class         now   +1    +2    +3   ...  +14   P(>=90% by +2)  alert
+  Low           0.78  0.80  0.83  0.85      0.81  0.04            warning on +2
+  Medium        0.86  0.88  0.91  0.92      0.84  0.58            critical on +2
+  High          0.71  0.72  0.74  0.73      0.70  0.00            ok
+  Medium W1000  0.69  0.70  0.70  0.72      0.66  0.00            ok
+  High W1000    0.64  0.66  0.67  0.67      0.63  0.00            ok
+
+written  data/processed/forecast.parquet (70 rows)
+email    critical: Medium expected at 91% on 2026-11-04 06:00 (in about 48 h)
+```
 
 ## 4. Setup
 
@@ -227,6 +267,40 @@ Rungs, in order. A rung stays only if it beats the one below on the alerts it gi
 3. **Learned correction** of rung 2's errors (gradient boosting). Only with months of history.
 4. **Probabilistic candidates** from earlier drafts (fuzzy time series, a pretrained time-series model). Only if history allows a fair test.
 
+### History and plan horizon per rung
+
+Our estimates (H). All history comes from after the August layout change.
+
+| Rung | History to run | History to validate | Plan horizon |
+|---|---|---|---|
+| Persistence | 1 snapshot | 2–4 weeks of snapshots | none |
+| Flow balance | 1 snapshot | 2–4 weeks of snapshots, with the plan versions known on each day | 14 days. The 48 h email needs only 2–3 days. Assembly (about 3 weeks), moulding (3–4) and purchases (5–6) all cover this. |
+| Learned correction | About 3 months of flow-balance errors | Rolling backtest | same |
+| Pretrained model | A few weeks of context | 2–4 weeks | Plans as covariates, if the model takes them |
+
+Stored plan versions are the bottleneck, not snapshots (open point 6).
+
+**Short plans.** If a plan covers fewer days than the horizon, the days it doesn't cover fall back to persistence for that flow, and the output says so.
+
+### Where the uncertainty comes from
+
+The allocation is a fixed rule, so with complete inputs the forecast for +1 and +2 should be very accurate. Most of the remaining error is **epistemic**: it comes from variables we don't observe, and more knowledge reduces it. **Aleatoric** error is randomness we cannot reduce (`hullermeier2021uncertainty` in `research/references.bib`).
+
+| Source | Type | How to reduce it |
+|---|---|---|
+| Machine stops delaying work orders | Epistemic | Machine-stop logs (open point 8). Stops already running at 06:00 are known; future stops are not. |
+| When a pallbox becomes empty | Epistemic | Plan × bill of materials, Coster's picking rules |
+| Defrag moves | Epistemic | Coster's defrag rules |
+| Allowed classes, held-back cells | Epistemic | Load-unit master, estimate from snapshots |
+| Manual moves | Epistemic, no log | Plan gap only |
+| Supplier arrival times, plan changes after 06:00 | Mostly aleatoric from our side | Range from past gaps |
+
+What this means for the work:
+
+- If the flow balance does not clearly beat persistence at +1 and +2, a variable is missing. Find it before reaching for a more flexible model.
+- Read the plan gap before modelling it as noise.
+- `p_realised` stands in for what we don't observe, mainly machine stops and plan changes. Once the machine-stop logs are in, the range should get narrower.
+
 ### Allocation and one day of flow balance
 
 ```python
@@ -306,6 +380,13 @@ def as_of(versions, t, key="order_id"):
     latest = known.groupby(key)["version_created_at"].transform("max")
     return known[known["version_created_at"] == latest]
 ```
+
+**Other hindsight traps.** These are data that would not exist at 06:00 on t:
+
+- today's cell master applied to past dates. Use the capacity valid on each date, from after the August change only.
+- machine-stop logs, which are written after the stop. Use only stops that started before 06:00 on t.
+- rules estimated on the whole period (held-back cells, allowed classes, `p_realised`). Estimate them on the training window of each backtest fold only.
+- the mock data. `dataset/mock.py` sets planned flows equal to actual flows, which means perfect plans. Never compare methods on it until it has plan noise.
 
 **Two replays:**
 

@@ -17,12 +17,12 @@ Each source is listed in its topic index with a link and a BibTeX key in `refere
 ## After the review feedback (18 October)
 
 The reviewer asked us to define the input and output before choosing a method, and to start with an
-MVP built on the production plan. That is now in
-[docs/group1-data-forecasting/problem-definition.md](../docs/group1-data-forecasting/problem-definition.md).
+MVP built on the production plan. That is now in the Group 1 plan, v0.5
+([data-forecasting-plan.md](../docs/group1-data-forecasting/data-forecasting-plan.md), sections 3, 8 and 9).
 For this sprint it means:
 
-- The method comparison below is for **MVP 5**, the challengers. MVP 1 is the deterministic flow
-  balance on the production plan.
+- The method comparison below is for **rungs 3 and 4** of the forecast ladder (plan, section 8).
+  The first step is the deterministic flow balance on the production plan.
 - The process is largely rule-based, so most leftover error is **epistemic**: variables we don't
   observe, such as machine stops, picking and defrag. Read the analog and uncertainty sources with
   that question in mind: how do they separate what is known in advance from what is not?
