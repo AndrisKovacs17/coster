@@ -14,6 +14,20 @@ Each source is listed in its topic index with a link and a BibTeX key in `refere
 - [warehouse-and-simulation/](warehouse-and-simulation/README.md)
 - [alerts-and-dashboards/](alerts-and-dashboards/README.md)
 
+## After the review feedback (18 October)
+
+The reviewer asked us to define the input and output before choosing a method, and to start with an
+MVP built on the production plan. That is now in
+[docs/group1-data-forecasting/problem-definition.md](../docs/group1-data-forecasting/problem-definition.md).
+For this sprint it means:
+
+- The method comparison below is for **MVP 5**, the challengers. MVP 1 is the deterministic flow
+  balance on the production plan.
+- The process is largely rule-based, so most leftover error is **epistemic**: variables we don't
+  observe, such as machine stops, picking and defrag. Read the analog and uncertainty sources with
+  that question in mind: how do they separate what is known in advance from what is not?
+- Every candidate must use only data known at 06:00 on the run date (no hindsight data).
+
 ## The options on the table and where to read about them
 
 These are the approaches raised on 16 October, plus the analog cases.

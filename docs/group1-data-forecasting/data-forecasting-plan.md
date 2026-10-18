@@ -8,6 +8,9 @@ What changed from v0.3:
 - The plan is now a concrete coding plan in Python. It covers setup, repo layout, how the warehouse looks in code, each module, tests, and who builds what by when.
 - The code sketches below were run and tested with pandas 3.0, numpy 2.5 and pandera 0.34. They are starting points, not finished code.
 
+Input, output, data needs, uncertainty sources and the MVP order are defined in
+[problem-definition.md](problem-definition.md) (review feedback, 18 October).
+
 Items marked (H) are hypotheses. Nothing here promises forecast accuracy.
 
 ## 1. What we already know
