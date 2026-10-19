@@ -12,6 +12,7 @@ a method, and what we already ruled out.
 | `uncertainty-and-evaluation/` | Prediction intervals, conformal methods, scoring rules, backtesting, alert metrics |
 | `warehouse-and-simulation/` | AS/RS and warehouse simulation, storage assignment, digital twins, analog domains |
 | `alerts-and-dashboards/` | Alert design, thresholds, notification practice, dashboard design |
+| `databases/` | Cross-topic research databases (CSV): similar warehouses, data needs, models, literature, datasets. Start with `insights.csv` |
 | `references.bib` | One BibTeX entry per source, used by all folders |
 | `_TEMPLATE.md` | Template for a note on one source |
 
