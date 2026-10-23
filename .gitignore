@@ -229,5 +229,7 @@ data/**
 # Coster exports are Excel files. Keep them out of the repo everywhere.
 *.xlsx
 *.xls
+# Audit and analysis outputs can contain Coster data
+outputs/
 # Pipeline outputs
 *.parquet
