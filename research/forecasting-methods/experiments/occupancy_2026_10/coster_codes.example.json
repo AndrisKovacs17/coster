@@ -1,0 +1,11 @@
+{
+  "_comment": "Copy to coster_codes.json in your Coster data folder (outside the repo) and fill in the real codes from the plan (TP_PALLET) and 'UDC vs CELLE' (TP_UDC). Never commit the filled file.",
+  "finished_goods_article_prefix": "ART",
+  "pallet_material_prefix_len": 6,
+  "tall_from_layers": 4,
+  "pallet_types": {
+    "000001": {"normal": 1, "tall": 2, "family": "L1000"},
+    "000002": {"normal": 4, "tall": 5, "family": "80x120"}
+  },
+  "wide_load_unit_types": [1, 2]
+}
