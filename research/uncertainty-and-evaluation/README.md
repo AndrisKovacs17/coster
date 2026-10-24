@@ -20,3 +20,9 @@ metrics. See the Group 1 plan, sections 8 and 9.
 | ["A scoring framework for tiered warnings and multicategorical forecasts based on fixed risk measures"](https://arxiv.org/abs/2108.12814) | Paper | to read | Scores tiered warnings such as our warning and critical levels. Authors not yet recorded. |
 | Hüllermeier and Waegeman 2021, aleatoric and epistemic uncertainty (`hullermeier2021uncertainty`), [arXiv 1910.09457](https://arxiv.org/abs/1910.09457) | Review, open | to read | Terms used in the review feedback. Epistemic = reducible with more knowledge (our unobserved variables). See the Group 1 plan, section 8. |
 | Kaufman et al. 2012, leakage in data mining (`kaufman2012leakage`), [DOI](https://doi.org/10.1145/2382577.2382579) | Paper | to read | Hindsight data in training and backtests. Their fix is to keep what the model learns from separate from what it predicts. Matches our as-of rule. |
+
+### Our studies
+
+| Study | Type | Status | Note |
+|---|---|---|---|
+| Alert and interval evaluation on the first Coster data drop, Oct 2026 | Own experiment | done | Section "Results: alerts and ranges" of [../forecasting-methods/occupancy-backtest-2026-10.md](../forecasting-methods/occupancy-backtest-2026-10.md). Gaussian ensemble probability vs event classifiers, calibration, cost-based alert threshold, pre-registration with hashes. |

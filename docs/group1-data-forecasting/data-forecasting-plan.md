@@ -17,6 +17,18 @@ What changed from v0.3:
 
 Items marked (H) are hypotheses. Nothing here promises forecast accuracy.
 
+**Status after the first data drop (24 October 2026).** Coster sent nine files on 23 October. What
+we learned is in [the backtest note](../../research/forecasting-methods/occupancy-backtest-2026-10.md)
+and in [notebooks/coster_data_analysis.ipynb](../../notebooks/coster_data_analysis.ipynb). In short:
+
+- Open point 3 is answered. The cell table lists each load unit with its ID, type, article and
+  quantity, so `daily_flows` (section 7) works from two consecutive cell tables. The cell table is
+  extracted during the working day, not at 06:00.
+- Only one plan version exists, so the realistic replay (section 9) starts once daily plans are
+  archived. Rung 2 is built as an experiment and its forecast is pre-registered.
+- With the history alone, the best statistical ensemble beats persistence by about 5–10% at
+  48 hours and 15–25% at 7–14 days. At 1 day nothing beats persistence.
+
 ## 1. What we already know
 
 | Topic | What we know | Source |

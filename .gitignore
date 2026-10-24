@@ -231,3 +231,5 @@ data/**
 *.xls
 # Pipeline outputs
 *.parquet
+# Notebook and script outputs (charts, tables) can contain Coster data
+outputs/

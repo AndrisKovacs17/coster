@@ -52,3 +52,9 @@ and have not been read in full yet.
 | Hyndman and Athanasopoulos 2021, FPP3 (`hyndman2021fpp3`), [otexts.com/fpp3](https://otexts.com/fpp3/) | Book, free | reference | Baselines, prediction intervals, time-series cross-validation |
 | Taylor and Letham 2018, Prophet (`taylor2018prophet`), [DOI](https://doi.org/10.1080/00031305.2017.1380080) | Paper | to read | Trend, seasonality and holiday regression. A common default we may be asked about. |
 | Ben Taieb et al. 2012, multi-step strategies (`bentaieb2011multistep`), [arXiv 1108.3259](https://arxiv.org/abs/1108.3259) | Paper | to read | Recursive vs direct vs multi-output for a 1–14 day horizon. Multi-output did best on NN5. |
+
+### Our studies
+
+| Study | Type | Status | Note |
+|---|---|---|---|
+| Occupancy backtest on the first Coster data drop, Oct 2026 | Own experiment | done | [occupancy-backtest-2026-10.md](occupancy-backtest-2026-10.md), code in [experiments/occupancy_2026_10/](experiments/occupancy_2026_10/). Persistence, mean reversion, Ridge, LightGBM, SARIMAX, Chronos-2 zero-shot, a plan-based simulator and a pre-registered forecast. |

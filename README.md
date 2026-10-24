@@ -28,7 +28,8 @@ uv run --extra dashboard streamlit run src/coster/dashboard/app.py
 ## Data
 
 Coster's data is confidential and never goes into git. Put the exports in `data/raw/`, which is
-git-ignored. Notebook outputs are stripped on commit, because they can contain data.
+git-ignored. Notebook outputs are stripped on commit, because they can contain data. Charts and
+results from notebooks and scripts go to `outputs/` (git-ignored) or outside the repo.
 
 ## Status
 
@@ -37,5 +38,6 @@ git-ignored. Notebook outputs are stripped on commit, because they can contain d
 | Contract schemas (`daily_dataset`, `forecast`) | Done. Changes need a PR approved by both groups. |
 | Mock pipeline | Runs end to end with the persistence baseline |
 | Snapshot flows, allocation cascade, flow balance, Monte Carlo, as-of filter | Done and tested on toy data |
-| Loaders for Coster's files | Waiting for the first sample files |
+| Loaders for Coster's files | First files arrived on 23 Oct. Cleaning and exploration in `notebooks/coster_data_analysis.ipynb`. Package loaders still to write. |
+| Backtest on the first data drop | Done. [research/forecasting-methods/occupancy-backtest-2026-10.md](research/forecasting-methods/occupancy-backtest-2026-10.md) |
 | Alerts, dashboard | Group 2 |
